@@ -35,21 +35,43 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 
 /** Takes object with option filter values:
  * { nameLike: "fakeCo", minEmployees: "2", maxEmployees: "98"}
- * 
- * Returns statement to be used in WHERE clause in sql query:
+ *
+ * Returns entire WHERE sql query:
  * "name ILIKE '%eCo%' AND num_employees > 30 AND num_employess < 250"
- * 
+ *
  * If maxEmployees < minEmployees, throw 400 error
  */
 function generateSqlWhereClause(filters) {
   const { nameLike, minEmployees, maxEmployees } = filters;
+
   if ((maxEmployees && minEmployees) && (maxEmployees > minEmployees)) {
     throw new BadRequestError('maxEmployees cannot exceed minEmployees')
   };
-  
+
+  let clause = 'WHERE ';
+
+  // nameLike
+  if (nameLike) {
+    clause +=
+      Object.keys.length > 1 ?
+      `name ILIKE '%${nameLike}%' AND ` :
+      `name ILIKE '%${nameLike}%'`
+  }
+
+  // minEmployees
+  if (minEmployees) {
+    clause +=
+      `num_employees >= ${minEmployees}`;
+  }
+
+  // maxEmployees
+  if (maxEmployees) {
+    clause +=
+      `num_employees <= ${maxEmployees}`;
+  }
 
 
-  return clause
+  return clause;
 }
 
 module.exports = { sqlForPartialUpdate };

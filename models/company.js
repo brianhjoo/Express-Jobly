@@ -54,7 +54,9 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll() {
+  static async findAll(filters) {
+    // if filters, then call generateSqlWhereClause
+
     const companiesRes = await db.query(
         `SELECT handle,
                 name,
@@ -62,6 +64,7 @@ class Company {
                 num_employees AS "numEmployees",
                 logo_url AS "logoUrl"
            FROM companies
+
            ORDER BY name`);
     return companiesRes.rows;
   }
