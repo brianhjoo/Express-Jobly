@@ -42,26 +42,34 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
  * If maxEmployees < minEmployees, throw 400 error
  */
 function generateSqlWhereClause(filters) {
+
+  // if (Object.keys(filters).length === 0) return "";
   const { nameLike, minEmployees, maxEmployees } = filters;
 
-  if ((maxEmployees && minEmployees) && (maxEmployees > minEmployees)) {
+  if ((maxEmployees && minEmployees) && (maxEmployees < minEmployees)) {
     throw new BadRequestError('maxEmployees cannot exceed minEmployees')
   };
 
-  let clause = 'WHERE ';
+  
+  let clause = (nameLike || minEmployees|| maxEmployees) ? 'WHERE ': "";
 
   // nameLike
   if (nameLike) {
-    clause +=
-      Object.keys.length > 1 ?
-      `name ILIKE '%${nameLike}%' AND ` :
-      `name ILIKE '%${nameLike}%'`
+    clause +=  `name ILIKE '%${nameLike}%'`
+    if (minEmployees || maxEmployees) {
+      clause += ` AND `
+    }
+      // Object.keys.length > 1 ?
+      // `name ILIKE '%${nameLike}%' AND ` :
+      // `name ILIKE '%${nameLike}%'`
   }
 
   // minEmployees
   if (minEmployees) {
-    clause +=
-      `num_employees >= ${minEmployees}`;
+    clause += `num_employees >= ${minEmployees}`
+    if (maxEmployees) {
+      clause += ` AND `
+    }
   }
 
   // maxEmployees
@@ -70,8 +78,7 @@ function generateSqlWhereClause(filters) {
       `num_employees <= ${maxEmployees}`;
   }
 
-
   return clause;
 }
 
-module.exports = { sqlForPartialUpdate };
+module.exports = { sqlForPartialUpdate, generateSqlWhereClause };

@@ -8,6 +8,7 @@ const express = require("express");
 const { BadRequestError } = require("../expressError");
 const { ensureLoggedIn } = require("../middleware/auth");
 const Company = require("../models/company");
+const { generateSqlWhereClause } = require("../helpers/sql.js");
 
 const companyNewSchema = require("../schemas/companyNew.json");
 const companyUpdateSchema = require("../schemas/companyUpdate.json");
@@ -51,11 +52,9 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  const filterCriteria = req.query;
+  const filters = req.query;
 
-  console.log('filterCriteria:', filterCriteria);
-
-  const companies = await Company.findAll();
+  const companies = await Company.findAll(filters);
   return res.json({ companies });
 });
 
