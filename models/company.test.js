@@ -87,7 +87,7 @@ describe("findAll", function () {
     ]);
   });
 
-  test("works: 1 filter", async function () {
+  test("works: nameLike", async function () {
     const filters = { nameLike: "C2" }
     let companies = await Company.findAll(filters);
     expect(companies).toEqual([
@@ -154,6 +154,7 @@ describe("findAll", function () {
     const filters = { minEmployees: 3, maxEmployees: 2 }
     try {
       companies = await Company.findAll(filters);
+      throw new Error('Should not get here');
     } catch (err) {
       expect(err instanceof BadRequestError).toBeTruthy();
     }
@@ -163,7 +164,7 @@ describe("findAll", function () {
     const filters = { nameLike: "z" }
     let companies = await Company.findAll(filters);
     expect(companies).toEqual([])
-  })
+  });
 });
 
 /************************************** get */

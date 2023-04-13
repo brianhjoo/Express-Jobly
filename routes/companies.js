@@ -51,9 +51,11 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  * Authorization required: none
  */
 
+
+///TODO write test comparing minEmp 11, maxEmp 2
 router.get("/", async function (req, res, next) {
   const filters = req.query;
-
+  ///{nameLike, Number(minEmp), Number(maxEmp)}
   const companies = await Company.findAll(filters);
   return res.json({ companies });
 });

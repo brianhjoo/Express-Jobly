@@ -24,7 +24,7 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   // {firstName: 'Aliya', age: 32} => ['"first_name"=$1', '"age"=$2']
 
   const cols = keys.map((colName, idx) =>
-      `"${jsToSql[colName] || colName}"=$${idx + 1}`,
+    `"${jsToSql[colName] || colName}"=$${idx + 1}`,
   );
 
   return {
@@ -46,21 +46,25 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
  */
 function generateSqlWhereClause(filters) {
   const { nameLike, minEmployees, maxEmployees } = filters;
-
+  ///TODO account for undefined eg 0
   if ((maxEmployees && minEmployees) && (maxEmployees < minEmployees)) {
     throw new BadRequestError('maxEmployees cannot exceed minEmployees')
   };
 
-  let clause = (nameLike || minEmployees|| maxEmployees) ? 'WHERE ': "";
+  let clause = (nameLike || minEmployees || maxEmployees) ? 'WHERE ' : "";
+
+  const values = [];
 
   if (nameLike) {
-    clause +=  `name ILIKE '%$1%'`
+    values.push(`%${nameLike}%`);
+    clause += `name ILIKE $1`
     if (minEmployees || maxEmployees) {
       clause += ` AND `
     }
   }
 
   if (minEmployees) {
+    values.push(minEmployees);
     const placeholder = nameLike ? '$2' : '$1';
     clause += `num_employees >= ${placeholder}`
     if (maxEmployees) {
@@ -69,14 +73,12 @@ function generateSqlWhereClause(filters) {
   }
 
   if (maxEmployees) {
+    values.push(maxEmployees);
     clause +=
-      `num_employees <= $${Object.keys.length}`;
+      `num_employees <= $${Object.keys(filters).length}`;
   }
 
-  return {
-    clause: clause,
-    values: Object.values(filters)
-  };
+  return { clause, values };
 }
 
 
