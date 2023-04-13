@@ -36,49 +36,48 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 /** Takes object with option filter values:
  * { nameLike: "fakeCo", minEmployees: "2", maxEmployees: "98"}
  *
- * Returns entire WHERE sql query:
- * "name ILIKE '%eCo%' AND num_employees > 30 AND num_employess < 250"
+ * Returns an object with WHERE clause and parameterized values:
+ *  {
+ *   clause: "WHERE name ILIKE '%$1%' AND num_employees >= $2 AND num_employees <= $1",
+ *   values: [ 'fakeCo', '2', '98' ]
+ *  }
  *
  * If maxEmployees < minEmployees, throw 400 error
  */
 function generateSqlWhereClause(filters) {
-
-  // if (Object.keys(filters).length === 0) return "";
   const { nameLike, minEmployees, maxEmployees } = filters;
 
   if ((maxEmployees && minEmployees) && (maxEmployees < minEmployees)) {
     throw new BadRequestError('maxEmployees cannot exceed minEmployees')
   };
 
-  
   let clause = (nameLike || minEmployees|| maxEmployees) ? 'WHERE ': "";
 
-  // nameLike
   if (nameLike) {
-    clause +=  `name ILIKE '%${nameLike}%'`
+    clause +=  `name ILIKE '%$1%'`
     if (minEmployees || maxEmployees) {
       clause += ` AND `
     }
-      // Object.keys.length > 1 ?
-      // `name ILIKE '%${nameLike}%' AND ` :
-      // `name ILIKE '%${nameLike}%'`
   }
 
-  // minEmployees
   if (minEmployees) {
-    clause += `num_employees >= ${minEmployees}`
+    const placeholder = nameLike ? '$2' : '$1';
+    clause += `num_employees >= ${placeholder}`
     if (maxEmployees) {
       clause += ` AND `
     }
   }
 
-  // maxEmployees
   if (maxEmployees) {
     clause +=
-      `num_employees <= ${maxEmployees}`;
+      `num_employees <= $${Object.keys.length}`;
   }
 
-  return clause;
+  return {
+    clause: clause,
+    values: Object.values(filters)
+  };
 }
+
 
 module.exports = { sqlForPartialUpdate, generateSqlWhereClause };

@@ -60,7 +60,8 @@ describe("create", function () {
 
 describe("findAll", function () {
   test("works: no filter", async function () {
-    let companies = await Company.findAll();
+    const filters = {};
+    let companies = await Company.findAll(filters);
     expect(companies).toEqual([
       {
         handle: "c1",
@@ -150,7 +151,7 @@ describe("findAll", function () {
   });
 
   test("works: throws error if min > max", async function () {
-    const filters = { minEmployees: 3, maxEmployess: 2 }
+    const filters = { minEmployees: 3, maxEmployees: 2 }
     try {
       companies = await Company.findAll(filters);
     } catch (err) {
