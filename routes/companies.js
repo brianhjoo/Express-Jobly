@@ -6,7 +6,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
-const { ensureLoggedIn } = require("../middleware/auth");
+const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 const Company = require("../models/company");
 const { generateSqlWhereClause } = require("../helpers/sql.js");
 
@@ -26,10 +26,11 @@ const router = new express.Router();
  */
 
 router.post("/", ensureLoggedIn, async function (req, res, next) {
+  console.log("Create company running")
   const validator = jsonschema.validate(
     req.body,
     companyNewSchema,
-    {required: true}
+    { required: true }
   );
   if (!validator.valid) {
     const errs = validator.errors.map(e => e.stack);
@@ -60,22 +61,20 @@ router.get("/", async function (req, res, next) {
 
   for (let key in filters) {
     if (!(options.includes(key))) {
-      throw new BadRequestError('1');
+      throw new BadRequestError();
     }
     if (key === 'minEmployees') {
       filters[key] = Number(filters[key]);
 
-      console.log('filters[key]:', filters[key]);
-
       if (isNaN(filters[key])) {
-        throw new BadRequestError('2');
+        throw new BadRequestError();
       }
     }
     if (key === 'maxEmployees') {
       filters[key] = Number(filters[key]);
 
       if (isNaN(filters[key])) {
-        throw new BadRequestError('3');
+        throw new BadRequestError();
       }
     }
   }
@@ -113,7 +112,7 @@ router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
   const validator = jsonschema.validate(
     req.body,
     companyUpdateSchema,
-    {required:true}
+    { required: true }
   );
   if (!validator.valid) {
     const errs = validator.errors.map(e => e.stack);
