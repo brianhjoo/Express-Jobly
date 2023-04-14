@@ -149,6 +149,15 @@ describe("GET /companies", function () {
     });
   });
 
+  // test("error: throws Error if minEmployees > maxEmployees", async function () {
+  //   try {
+  //     await request(app).get("/companies/?minEmployees=11&maxEmployees=4");
+  //     throw new Error("Fail this should not be thrown");
+  //   } catch (err) {
+  //     expect(err instanceof BadRequestError).toBeTruthy();
+  //   }
+  // });
+
   test("fails: test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---
     // thus making it hard to test that the error-handler works with it. This

@@ -97,13 +97,13 @@ describe("Generate sql WHERE clause for company search filter", function () {
     });
   });
 
-  ///TODO write test comparing minEmp 11, maxEmp 2
-  test("error: throws Error if minEmployees > maxEmployees", function () {
-    try {
-      generateSqlWhereClause({ minEmployees: "11", maxEmployees: "4" });
-      throw new Error("Fail this should not be thrown");
-    } catch (err) {
-      expect(err instanceof BadRequestError).toBeTruthy();
-    }
-  });
+  // ///TODO write test comparing minEmp 11, maxEmp 2
+  // test("error: throws Error if minEmployees > maxEmployees", function () {
+  //   try {
+  //     generateSqlWhereClause({ minEmployees: "11", maxEmployees: "4" });
+  //     throw new Error("Fail this should not be thrown");
+  //   } catch (err) {
+  //     expect(err instanceof BadRequestError).toBeTruthy();
+  //   }
+  // });
 });

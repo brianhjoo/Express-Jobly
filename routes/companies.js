@@ -55,8 +55,33 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 ///TODO write test comparing minEmp 11, maxEmp 2
 router.get("/", async function (req, res, next) {
   const filters = req.query;
-  ///{nameLike, Number(minEmp), Number(maxEmp)}
+
+  const options = ['nameLike', 'minEmployees', 'maxEmployees'];
+
+  for (let key in filters) {
+    if (!(options.includes(key))) {
+      throw new BadRequestError('1');
+    }
+    if (key === 'minEmployees') {
+      filters[key] = Number(filters[key]);
+
+      console.log('filters[key]:', filters[key]);
+
+      if (isNaN(filters[key])) {
+        throw new BadRequestError('2');
+      }
+    }
+    if (key === 'maxEmployees') {
+      filters[key] = Number(filters[key]);
+
+      if (isNaN(filters[key])) {
+        throw new BadRequestError('3');
+      }
+    }
+  }
+
   const companies = await Company.findAll(filters);
+
   return res.json({ companies });
 });
 
