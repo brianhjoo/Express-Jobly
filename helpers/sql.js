@@ -46,12 +46,12 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
  */
 function generateSqlWhereClause(filters) {
   const { nameLike, minEmployees, maxEmployees } = filters;
-  ///TODO account for undefined eg 0
+ 
   if ((maxEmployees !== undefined && minEmployees !== undefined)
        && (maxEmployees < minEmployees)) {
     throw new BadRequestError('maxEmployees cannot exceed minEmployees')
   };
-  // FIXME: truthy falsy stuff
+
   let clause = (nameLike !== undefined ||
                 minEmployees !== undefined ||
                 maxEmployees !== undefined) ? 'WHERE ' : "";
