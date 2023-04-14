@@ -121,42 +121,15 @@ describe("GET /companies", function () {
 
   test("prevents bad data from being entered", async function () {
     const resp = await request(app).get("/companies/?color=red");
-    expect(resp.body).toEqual({
-      companies:
-        [
-          {
-            handle: "c1",
-            name: "C1",
-            description: "Desc1",
-            numEmployees: 1,
-            logoUrl: "http://c1.img",
-          },
-          {
-            handle: "c2",
-            name: "C2",
-            description: "Desc2",
-            numEmployees: 2,
-            logoUrl: "http://c2.img",
-          },
-          {
-            handle: "c3",
-            name: "C3",
-            description: "Desc3",
-            numEmployees: 3,
-            logoUrl: "http://c3.img",
-          },
-        ]
-    });
+    expect(resp.statusCode).toEqual(400);
+ 
   });
 
-  // test("error: throws Error if minEmployees > maxEmployees", async function () {
-  //   try {
-  //     await request(app).get("/companies/?minEmployees=11&maxEmployees=4");
-  //     throw new Error("Fail this should not be thrown");
-  //   } catch (err) {
-  //     expect(err instanceof BadRequestError).toBeTruthy();
-  //   }
-  // });
+  test("error: throws Error if minEmployees > maxEmployees", async function () {
+    const resp = await request(app).get("/companies/?minEmployees=11&maxEmployees=4");
+
+    expect(resp.statusCode).toEqual(400);
+  });
 
   test("fails: test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---
