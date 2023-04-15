@@ -20,7 +20,7 @@ function authenticateJWT(req, res, next) {
     const authHeader = req.headers && req.headers.authorization;
     if (authHeader) {
       const token = authHeader.replace(/^[Bb]earer /, "").trim();
-      console.log("token: ", token)
+      console.log("token: ", token);
       res.locals.user = jwt.verify(token, SECRET_KEY);
     }
     return next();
@@ -35,25 +35,47 @@ function authenticateJWT(req, res, next) {
  */
 
 function ensureLoggedIn(req, res, next) {
-    if (!res.locals.user) throw new UnauthorizedError();
-    return next();
+  if (!res.locals.user) throw new UnauthorizedError();
+  return next();
 }
 
 /** Middleware to use when they must be logged in and an admin
- * 
+ *
  * If not, raise Unauthorized.
  */
 
 function ensureAdmin(req, res, next) {
   const user = res.locals.user;
+
   if (user && user.isAdmin === true) {
     return next();
   }
+
   throw new UnauthorizedError();
 }
+
+/** Middleware to use to check to see if they are logged in user
+ * or is an admin.
+ *
+ * If not, raise Unauthorized
+ */
+
+function ensureLoggedInUserOrAdmin(req, res, next) {
+  const loggedInUser = res.locals.user;
+  const requestedUser = req.params.username;
+
+  if ((loggedInUser.username === requestedUser) || loggedInUser.isAdmin === true) {
+    return next();
+  }
+
+  throw new UnauthorizedError();
+}
+
+
 
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
-  ensureAdmin
+  ensureAdmin,
+  ensureLoggedInUserOrAdmin,
 };

@@ -6,6 +6,7 @@ const {
   authenticateJWT,
   ensureLoggedIn,
   ensureAdmin,
+  ensureLoggedInUserOrAdmin,
 } = require("./auth");
 
 
@@ -64,7 +65,7 @@ describe("ensureLoggedIn", function () {
 
 describe("ensureAdmin", function () {
   test("works", function () {
-    const req = {};
+    const req = { headers: { authorization: `Bearer ${testAdminJwt}` } };
     const res = { locals: { user: { username: "testAdmin", isAdmin: true }}}
     ensureAdmin(req, res, next);
   });
@@ -75,4 +76,25 @@ describe("ensureAdmin", function () {
     expect(() => ensureAdmin(req, res, next)).toThrowError();
   });
 
+})
+
+
+describe("ensureLoggedInUserOrAdmin", function () {
+  test("works for admin", function () {
+    const req = { params: { authorization: `Bearer ${testAdminJwt}` } };
+    const res = { locals: { user: { username: "testAdmin", isAdmin: true }}}
+    ensureLoggedInUserOrAdmin(req, res, next);
+  });
+
+  test("works for logged in user", function () {
+    const req = { params: { authorization: `Bearer ${testJwt}` } };
+    const res = { locals: { user: { username: "test", isAdmin: false }}}
+    ensureLoggedInUserOrAdmin(req, res, next);
+  });
+
+  test("unauth if no login", function () {
+    const req = {};
+    const res = { locals: {} };
+    expect(() => ensureLoggedInUserOrAdmin(req, res, next)).toThrowError();
+  });
 })
